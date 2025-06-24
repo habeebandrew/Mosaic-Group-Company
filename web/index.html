@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- PWA meta tags for better performance -->
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Mosaic Company">
+  
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Mosaic Company</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      z-index: 999;
+    }
+    
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="loader"></div>
+  </div>
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = '{{flutter_service_worker_version}}';
+  </script>
+  
+  <script src="flutter.js" defer></script>
+  
+  <script>
+    window.addEventListener('load', async function() {
+      const loading = document.querySelector('#loading');
+      
+      try {
+        // Configure Flutter with modern service worker registration
+        await flutter.loader.loadEntrypoint({
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+            serviceWorkerUrl: 'flutter_service_worker.js?v=' + serviceWorkerVersion
+          },
+          onEntrypointLoaded: async function(engineInitializer) {
+            // Optimized configuration - using HTML renderer only
+            const appRunner = await engineInitializer.initializeEngine({
+              renderer: "html",
+              useColorEmoji: false,
+              // Disable CanvasKit loading
+              canvasKitBaseUrl: null
+            });
+            
+            // Fade out and remove loading indicator
+            loading.style.opacity = '0';
+            setTimeout(() => loading.remove(), 500);
+            
+            // Run the app
+            await appRunner.runApp();
+          }
+        });
+      } catch (e) {
+        console.error('Error loading application:', e);
+        loading.textContent = 'Error loading the application. Please refresh the page.';
+      }
+    });
+  </script>
+</body>
+</html>
